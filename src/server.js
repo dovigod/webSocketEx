@@ -26,9 +26,9 @@ const wss = new WebSocket.Server({ server });
 
 wss.on('connection', (socket) => {
 	console.log('Connected to Browser✅');
-	socket.send('hello!!');
 	socket.on('message', (message) => {
-		console.log(message.toString('utf-8'));
+		const givenMessage = message.toString('utf-8');
+		socket.send(givenMessage);
 	});
 	socket.on('close', () => console.log('Disconnected from Browser❌'));
 });
