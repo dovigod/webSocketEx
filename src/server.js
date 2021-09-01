@@ -24,9 +24,13 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 //이러면 http , wss 둘다 돌릴수 있음
 
-const handleConnection = (socket) => {
-	console.log(socket);
-};
-wss.on('connection', handleConnection);
+wss.on('connection', (socket) => {
+	console.log('Connected to Browser✅');
+	socket.send('hello!!');
+	socket.on('message', (message) => {
+		console.log(message.toString('utf-8'));
+	});
+	socket.on('close', () => console.log('Disconnected from Browser❌'));
+});
 
 server.listen(PORT, listener);
