@@ -1,4 +1,6 @@
 import express from 'express';
+import WebSocket from 'ws';
+import http from 'http';
 const app = express();
 const PORT = 4000;
 
@@ -8,9 +10,23 @@ app.set('view engine', 'pug');
 app.set('views', __dirname + '/views');
 
 const listener = () => {
-	console.log(`✅Listening to port : ${PORT}`);
+	console.log(`✅Listening to port : ${PORT} on WSS`);
 };
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
 	res.render('home.pug');
 });
-app.listen(PORT, listener);
+app.get('/*', (_, res) => {
+	res.redirect('/');
+});
+// app.listen(PORT, listener);
+
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+//이러면 http , wss 둘다 돌릴수 있음
+
+const handleConnection = (socket) => {
+	console.log(socket);
+};
+wss.on('connection', handleConnection);
+
+server.listen(PORT, listener);
