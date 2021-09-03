@@ -1,6 +1,7 @@
 import express from 'express';
 import WebSocket from 'ws';
 import http from 'http';
+import SocketIO from 'socket.io';
 const app = express();
 const PORT = 4000;
 
@@ -21,32 +22,41 @@ app.get('/*', (_, res) => {
 // app.listen(PORT, listener);
 
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-const sockets = [];
-//이러면 http , wss 둘다 돌릴수 있음
+// const wss = new WebSocket.Server({ server });
+// const sockets = [];
+// //이러면 http , wss 둘다 돌릴수 있음
 
-wss.on('connection', (socket) => {
-	sockets.push(socket);
-	socket['nickname'] = 'Anonymous';
-	console.log('Connected to Browser✅');
-	socket.on('message', (message) => {
-		const givenMessage = message.toString('utf-8');
-		const parsedMessage = JSON.parse(givenMessage);
-		console.log(parsedMessage);
+// wss.on('connection', (socket) => {
+// 	sockets.push(socket);
+// 	socket['nickname'] = 'Anonymous';
+// 	console.log('Connected to Browser✅');
+// 	socket.on('message', (message) => {
+// 		const givenMessage = message.toString('utf-8');
+// 		const parsedMessage = JSON.parse(givenMessage);
+// 		console.log(parsedMessage);
 
-		switch (parsedMessage.type) {
-			case 'user_message':
-				sockets.forEach((aSocket) => {
-					aSocket.send(socket['nickname'] + ':' + parsedMessage.payload);
-				});
-				break;
+// 		switch (parsedMessage.type) {
+// 			case 'user_message':
+// 				sockets.forEach((aSocket) => {
+// 					aSocket.send(socket['nickname'] + ':' + parsedMessage.payload);
+// 				});
+// 				break;
 
-			case 'nickname':
-				socket['nickname'] = parsedMessage.payload;
-				break;
-		}
+// 			case 'nickname':
+// 				socket['nickname'] = parsedMessage.payload;
+// 				break;
+// 		}
+// 	});
+// 	socket.on('close', () => console.log('Disconnected from Browser❌'));
+// });
+
+const wsServer = SocketIO(server);
+
+wsServer.on('connection', (socket) => {
+	socket.on('enter_room', (msg, done) => {
+		console.log(msg);
+		setTimeout(done, 3000);
 	});
-	socket.on('close', () => console.log('Disconnected from Browser❌'));
 });
 
 server.listen(PORT, listener);
